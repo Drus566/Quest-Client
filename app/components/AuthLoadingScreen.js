@@ -4,26 +4,33 @@ import {
     StatusBar,
 } from 'react-native';
 import { View } from '../styles/styles'
-import Api from '../other/Api'
+import AuthApi from '../other/AuthApi'
+import Storage from '../other/Storage'
 
 class AuthLoadingScreen extends React.Component {
     constructor(props) {
         super(props);
-        this.checkToken();
+        this.login();
     }
 
-    checkToken(){
-        return Api.checkUserRequest()
-            .then(( response ) => 
-            { 
-                if (response.ok) {
-                    this.props.navigation.navigate('App');
-                }else{
-                    this.props.navigation.navigate('Auth');
-                }
+    login(){
+        return AuthApi.loginRequest('invoker@mail.ru', '123456')
+            .then((token) => {
+                return AuthApi.checkUserRequest(token.jwt).then(( response ) => 
+                { 
+                    if (response.ok) {
+                        Storage.storeData("jwt", token.jwt);
+                        this.props.navigation.navigate('First');
+                    }
+                })
+                .catch(error => {
+                    this.props.navigation.navigate('Auth')
+                    console.log(error);
+                    return error;
+                });
             })
             .catch(error => {
-                return error;
+                throw(error);
             });
     }
         
@@ -38,3 +45,4 @@ class AuthLoadingScreen extends React.Component {
 }
 
 export default AuthLoadingScreen
+

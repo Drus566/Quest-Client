@@ -1,31 +1,25 @@
 
-// import { AsyncStorage } from "react-native"
+import { AsyncStorage } from "react-native"
 
-// class Storage {
-//     static token = null
+class Storage {
 
-//     // static Regist(){
-//     //     data = this.retrieveData('jwt')
-//     //     this.token = data
-//     //     console.log('Regist ' + JSON.stringify(this.token))
-//     //     return this.token
-//     // }
+    static storeData = async (key, value) => {
+        try {
+            await AsyncStorage.setItem(key, value) 
+            console.log(value);
+        } catch(error){
+            console.log(error);
+        }
+    }
 
-//     static storeData = async (key, value) => {
-//         try {
-//             await AsyncStorage.setItem(key, value) 
-//         } catch(error){
-//             console.log(error);
-//         }
-//     }
-
-//     static retrieveData = async () => {
-//         try {
-//             const value = await AsyncStorage.getItem('jwt');
-//             return value
-//         } catch (error) {
-//             // Error retrieving data
-//         }
-//     }
-// }
-// export default Storage
+    static retrieveData = async (key) => {
+        try {
+            const value = await AsyncStorage.getItem(key);
+            console.log(value);
+            return value;
+        } catch (error) {
+            console.log(error)
+        }
+    }
+}
+export default Storage

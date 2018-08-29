@@ -160,16 +160,27 @@ export const InputWindow = styled.View`
     flex: 1;
     background-color: #7B9B7B;
     align-items: center;
-    justifyContent: flex-start;
+    justify-content: flex-start;
 `;
 
 const InfoText = styled.Text`
-    color: red;
+    color: black;
     text-align: center;
 `;
 
-export const Info = ({text}) => (
-    <InfoText>{text}</InfoText>
+const ViewInfoText = styled.View`
+    flex: 0.2;
+    height: 2%;
+    width: 98%;
+    background-color: white;
+    align-items: center;
+    justify-content: flex-start;
+`
+
+export const Info = ({text, ...rest}) => (
+    <ViewInfoText {...rest}>
+        <InfoText>{text}</InfoText>
+    </ViewInfoText>
 )
 
 // const styles = StyleSheet.create({

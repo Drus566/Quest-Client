@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, GameView, AnswerView, Question } from '../styles/styles'
 import { Text, View, ActivityIndicator } from 'react-native'
 
-export default class FirstScreen extends React.Component {
+export default class GameScreen extends React.Component {
 
     constructor(props){
         super(props);

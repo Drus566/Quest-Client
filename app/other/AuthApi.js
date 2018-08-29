@@ -1,5 +1,5 @@
 
-class Api
+class AuthApi
 {
     static domen(path){
         return 'https://zx-drus-zx-quest-api.herokuapp.com' + path
@@ -74,4 +74,4 @@ class Api
     }
 }
 
-export default Api
+export default AuthApi

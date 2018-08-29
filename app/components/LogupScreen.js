@@ -1,7 +1,8 @@
 import React from 'react'
 import { Button, InputElement, InputWindow, Info } from '../styles/styles'
 import { KeyboardAvoidingView, View, ActivityIndicator } from 'react-native'
-import Api from '../other/Api'
+import AuthApi from '../other/AuthApi'
+import Storage from '../other/Storage'
 
 
 export default class LogupScreen extends React.Component {
@@ -16,14 +17,14 @@ export default class LogupScreen extends React.Component {
     
     logup(){
         this.setState({isLoading: true})
-        return Api.logupRequest(this.state.name, this.state.email, this.state.password)
+        return AuthApi.logupRequest(this.state.name, this.state.email, this.state.password)
             .then((token) => {
-                console.log('Login Screen ' + token)
-                return Api.checkUserRequest(token.jwt).then(( response ) => 
+                return AuthApi.checkUserRequest(token.jwt).then(( response ) => 
                 { 
                     this.setState({isLoading: false});
                     if (response.ok) {
-                        this.props.navigation.navigate('App');
+                        Storage.storeData("jwt", token.jwt);
+                        this.props.navigation.navigate('First');
                     }
                 })
                 .catch(error => {

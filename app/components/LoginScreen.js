@@ -1,7 +1,8 @@
 import React from 'react'
-import { Button, InputElement, InputWindow, Info } from '../styles/styles'
+import { Button, InputElement, InputWindow } from '../styles/styles'
 import { KeyboardAvoidingView, View, ActivityIndicator } from 'react-native'
-import Api from '../other/Api'
+import AuthApi from '../other/AuthApi'
+import Storage from '../other/Storage'
 
 export default class LoginScreen extends React.Component {
     constructor(props) {
@@ -13,14 +14,14 @@ export default class LoginScreen extends React.Component {
 
     login(){
         this.setState({isLoading: true})
-        return Api.loginRequest(this.state.email, this.state.password)
+        return AuthApi.loginRequest(this.state.email, this.state.password)
             .then((token) => {
-                console.log('Login Screen ' + token.jwt)
-                return Api.checkUserRequest(token.jwt).then(( response ) => 
+                return AuthApi.checkUserRequest(token.jwt).then(( response ) => 
                 { 
                     this.setState({isLoading: false});
                     if (response.ok) {
-                        this.props.navigation.navigate('App');
+                        Storage.storeData("jwt", token.jwt);
+                        this.props.navigation.navigate('First');
                     }
                 })
                 .catch(error => {

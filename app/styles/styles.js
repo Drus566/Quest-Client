@@ -70,6 +70,73 @@ export const RoomView = styled.View`
     `}
 `;
 
+export const RoomWindowQuests = styled.View`
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    background-color: #1898;
+`
+
+export const RoomWindowQuestsOwn = styled.View`
+    flex: 1;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: row;
+    height: 25%;
+`
+
+export const RoomWindowQuestsEnemy = styled.View`
+    flex: 1;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: row;
+    height: 25%;
+`
+
+export const RoomWindowQuestIndicator = styled.View`
+    flex: 0.25;
+    height: 100%;
+    justify-content: space-around;
+    background-color: ${props => props.successfully ? 'green' : props.unsuccessfully ? 'red' : 'white'};
+    border: 1px solid black;
+`
+
+export const RoomWindowRound = styled.View`
+    flex: 0.5;
+    height: 50%;
+    justify-content: center;
+    align-items: center;
+    background-color: yellow;
+    border: 1px solid black;
+    border-radius: 10px;
+`
+
+export const RoomRoundText = styled.Text`
+    color: black;
+    text-align: center;
+`
+
+// export const RoomWindowsQuestsBody = ({ oa1, oa2, oa3, ea1, ea2,ea3, roundText, ...rest }) => (
+//         <RoomWindowQuests {...rest}>
+//             <RoomWindowQuestsOwn>
+//                 <RoomWindowQuestIndicator/>
+//                 <RoomWindowQuestIndicator oa2/>
+//                 <RoomWindowQuestIndicator oa3/>
+//             </RoomWindowQuestsOwn>
+//             <RoomWindowRound>
+//                 <RoomRoundText>{roundText}</RoomRoundText>
+//             </RoomWindowRound>
+//             <RoomWindowQuestsEnemy>
+//                 <RoomWindowQuestIndicator {...(ea1)}/>
+//                 <RoomWindowQuestIndicator {...(ea2)}/>
+//                 <RoomWindowQuestIndicator {...(ea3)}/>
+//             </RoomWindowQuestsEnemy>
+//         </RoomWindowQuests>
+// )
+
+
+
 export const GameView = styled.View`
     flex: 1;
     background-color: #7C4A41;

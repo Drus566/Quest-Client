@@ -26,11 +26,12 @@ export default class FirstScreen extends React.Component {
             console.log(enemiesList);
             for ( i = 0; i < enemiesList.length; i++ )
             {   
+                let id = enemiesList[i];
                 console.log(enemiesList[i]);
                 buttonList.push(
                     <Button key={i} title={"Room " + enemiesList[i]} 
                         onPress={() => {this.props.navigation.navigate('Room', 
-                            { enemyId: enemiesList[i], infoMessage: "GGWP" })
+                            { enemyId: id, infoMessage: "GGWP" })
                         }}
                     />
                 )

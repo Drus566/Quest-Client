@@ -13,17 +13,17 @@ export default class RoomScreen extends React.Component {
                             firstUser: {
                                 id: 3,
                                 answers: {
-                                    first: "successfully",
-                                    second: "unsuccessfully",
-                                    third: "unsuccessfully"
+                                    first: "green",
+                                    second: "red",
+                                    third: "red"
                                 }
                             },
                             secondUser: {
                                 id: 2,
                                 answers: {
-                                    first: "successfully",
-                                    second: "successfully",
-                                    third: "successfully"
+                                    first: "green",
+                                    second: "green",
+                                    third: "green"
                                 }
                             }
                         },
@@ -31,17 +31,17 @@ export default class RoomScreen extends React.Component {
                             firstUser: {
                                 id: 3,
                                 answers: {
-                                    first: "successfully",
-                                    second: "unsuccessfully",
-                                    third: "unsuccessfully"
+                                    first: "green",
+                                    second: "red",
+                                    third: "red"
                                 }
                             },
                             secondUser: {
                                 id: 2,
                                 answers: {
-                                    first: "successfully",
-                                    second: "successfully",
-                                    third: "successfully"
+                                    first: "green",
+                                    second: "green",
+                                    third: "green"
                                 }
                             }
                         },
@@ -49,25 +49,22 @@ export default class RoomScreen extends React.Component {
                             firstUser: {
                                 id: 3,
                                 answers: {
-                                    first: "successfully",
-                                    second: "unsuccessfully",
-                                    third: "unsuccessfully"
+                                    first: "green",
+                                    second: "red",
+                                    third: "red"
                                 }
                             },
                             secondUser: {
                                 id: 2,
                                 answers: {
-                                    first: "successfully",
-                                    second: "successfully",
-                                    third: "successfully"
+                                    first: "green",
+                                    second: "green",
+                                    third: "green"
                                 }
                             }
                         },
                         completed: false,
                         first: null }
-                        // first_round: `${this.state.myId},ddd,${this.state.enemyId},ddd`,
-                        // second_round: `${this.state.myId},ddd,${this.state.enemyId},ddd`,
-                        // third_round: `${this.state.myId},ddd,${this.state.enemyId},ddd`,
     }
 
     componentWillMount(){
@@ -75,40 +72,51 @@ export default class RoomScreen extends React.Component {
         this.setState({ enemyId: navigation.getParam('enemyId', 'noId')})
         console.log(navigation.getParam('infoMessage'))
         console.log(this.state.enemyId)
+        console.log(Object.values(this.state.first_round.firstUser.answers));
     }   
 
+    // Проверяет какого типа ответы отдает компоненты с соответствующими атрибутами
     validAnswerHelper(answers){
+        console.log(answers[i]);
         let indicatorList = []
         for(i = 0; i < answers.length; i++){
-            if(answers[i] == "successfully"){
-                indicatorList.push(
-                    <RoomWindowQuestIndicator key={i} successfully/>
-                )
-            }else if(answers[i] == "unsuccessfully"){
-                indicatorList.push(
-                    <RoomWindowQuestIndicator key={i} unsuccessfully/>
-                )
-            }else{
-                indicatorList.push(
-                    <RoomWindowQuestIndicator key={i}/>
-                )
-            }
+            // React.createElement('RoomWindowQuestIndicator', { typeAnswer: {answer[i]}})
+            indicatorList.push(<RoomWindowQuestIndicator key={i} typeAnswer={answers[i]} />)
+            console.log(answers[i]);
+            // if(answers[i] == "successfully"){
+            //     indicatorList.push(
+            //         <RoomWindowQuestIndicator key={i} successfully/>
+            //     )
+            // }else if(answers[i] == "unsuccessfully"){
+            //     indicatorList.push(
+            //         <RoomWindowQuestIndicator key={i} unsuccessfully/>
+            //     )
+            // }else{
+            //     indicatorList.push(
+            //         <RoomWindowQuestIndicator key={i}/>
+            //     )
+            // }
         }
-        //console.log(indicatorList);
         return indicatorList 
     }
 
-    validRoundHelper(textRound, round, roomWindowsList = []){
+    //проверка ответов для определенного раунда и его возвращение для отрисовки
+    validRoundHelper(textRound, round){
         if(round){
+            console.log("3AWEL")
+            // берем ответы с состояния
             let firstAnswers = Object.values(round.firstUser.answers);
             let secondAnswers = Object.values(round.secondUser.answers);
+            console.log("First anwers - ", firstAnswers)
+            // отдаем их на проверку и формируем лист ответов
             let firstIndicatorList = this.validAnswerHelper(firstAnswers);
             let secondIndicatorList = this.validAnswerHelper(secondAnswers);
+            // проверка для отслеживания с какой стороны рендерить ответы с этого клиента
             if(round.firstUser.id == this.state.myId){
                 this.setState({ first : true })
             }
-            console.log(this.state.first);
-            roomWindowsList.push(
+
+            return (
                 <RoomWindowQuests>
                     <RoomWindowQuestsOwn>
                         {this.state.first ? firstIndicatorList : secondIndicatorList}
@@ -121,24 +129,22 @@ export default class RoomScreen extends React.Component {
                     </RoomWindowQuestsEnemy>
                 </RoomWindowQuests>
             )
-            //console.log(roomWindowsList)
-            return roomWindowsList
         }
     }
     
     render(){
-        var roomWindowList = [];
-        roomWindowList.push(this.validAnswerHelper("First Round", this.state.first_round));
-        roomWindowList.push(this.validAnswerHelper("Second Round", this.state.second_round, roomWindowList));
-        roomWindowList.push(this.validAnswerHelper("Third Round", this.state.third_round, roomWindowList));
-        //console.log(roomWindowList);
+        var firstRound = this.validRoundHelper("First Round", this.state.first_round);
+        var secondRound = this.validRoundHelper("Second Round", this.state.second_round);
+        var thirdRound = this.validRoundHelper("Third Round", this.state.third_round);
         return(
             <RoomView>
                 <RoomView header>
                     <Text>Enemy Id: {this.state.enemyId}</Text>
                 </RoomView>
                 <RoomView body>
-                    {roomWindowList}
+                    {firstRound}
+                    {secondRound}
+                    {thirdRound}
                 </RoomView>
                 <RoomView footer>
                     <Button 

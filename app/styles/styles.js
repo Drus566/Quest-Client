@@ -90,6 +90,7 @@ export const RoomWindowQuestsEnemy = styled.View`
     flex: 1;
     justify-content: space-around;
     align-items: center;
+    width: 100;
     flex-direction: row;
     height: 25%;
 `
@@ -97,14 +98,19 @@ export const RoomWindowQuestsEnemy = styled.View`
 export const RoomWindowQuestIndicator = styled.View`
     flex: 0.25;
     height: 100%;
+    width: 100;
     justify-content: space-around;
-    background-color: ${props => props.successfully ? 'green' : props.unsuccessfully ? 'red' : 'white'};
+    background-color: \function (props) {
+        return props.typeAnswer || "white";
+    };
     border: 1px solid black;
 `
+// ${props => props.successfully ? 'green' : props.unsuccessfully ? 'red' : 'white'};
 
 export const RoomWindowRound = styled.View`
     flex: 0.5;
     height: 50%;
+    width: 100;
     justify-content: center;
     align-items: center;
     background-color: yellow;

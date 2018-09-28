@@ -30,9 +30,9 @@ const TouchableOpacityMode = styled.TouchableOpacity`
     justify-content:center;
 `
 
-export const Button = ({ title, onPress, ...rest }) => (
+export const Button = ({ title, onPress, disabled, ...rest }) => (
     <ButtonWrapper {...rest}>
-        <TouchableOpacityMode onPress={onPress}>
+        <TouchableOpacityMode disabled={disabled} onPress={onPress}>
             <ButtonText>{title}</ButtonText>
         </TouchableOpacityMode>
     </ButtonWrapper>
@@ -70,7 +70,7 @@ export const RoomView = styled.View`
     `}
 `;
 
-export const RoomWindowQuests = styled.View`
+export const Quests = styled.View`
     flex: 1;
     justify-content: center;
     align-items: center;
@@ -78,7 +78,7 @@ export const RoomWindowQuests = styled.View`
     background-color: #1898;
 `
 
-export const RoomWindowQuestsOwn = styled.View`
+export const FirstIndicators = styled.View`
     flex: 1;
     justify-content: space-around;
     align-items: center;
@@ -86,7 +86,7 @@ export const RoomWindowQuestsOwn = styled.View`
     height: 25%;
 `
 
-export const RoomWindowQuestsEnemy = styled.View`
+export const SecondIndicators = styled.View`
     flex: 1;
     justify-content: space-around;
     align-items: center;
@@ -95,19 +95,16 @@ export const RoomWindowQuestsEnemy = styled.View`
     height: 25%;
 `
 
-export const RoomWindowQuestIndicator = styled.View`
+export const Indicator = styled.View`
     flex: 0.25;
     height: 100%;
     width: 100;
     justify-content: space-around;
-    background-color: \function (props) {
-        return props.typeAnswer || "white";
-    };
+    background-color: ${props => props.typeAnswer || "white"};
     border: 1px solid black;
 `
-// ${props => props.successfully ? 'green' : props.unsuccessfully ? 'red' : 'white'};
 
-export const RoomWindowRound = styled.View`
+export const Round = styled.View`
     flex: 0.5;
     height: 50%;
     width: 100;
@@ -122,26 +119,6 @@ export const RoomRoundText = styled.Text`
     color: black;
     text-align: center;
 `
-
-// export const RoomWindowsQuestsBody = ({ oa1, oa2, oa3, ea1, ea2,ea3, roundText, ...rest }) => (
-//         <RoomWindowQuests {...rest}>
-//             <RoomWindowQuestsOwn>
-//                 <RoomWindowQuestIndicator/>
-//                 <RoomWindowQuestIndicator oa2/>
-//                 <RoomWindowQuestIndicator oa3/>
-//             </RoomWindowQuestsOwn>
-//             <RoomWindowRound>
-//                 <RoomRoundText>{roundText}</RoomRoundText>
-//             </RoomWindowRound>
-//             <RoomWindowQuestsEnemy>
-//                 <RoomWindowQuestIndicator {...(ea1)}/>
-//                 <RoomWindowQuestIndicator {...(ea2)}/>
-//                 <RoomWindowQuestIndicator {...(ea3)}/>
-//             </RoomWindowQuestsEnemy>
-//         </RoomWindowQuests>
-// )
-
-
 
 export const GameView = styled.View`
     flex: 1;
@@ -173,7 +150,7 @@ const QuestionText = styled.Text`
     text-align: center;
 `;
 
-const QuestionView = styled.View`
+const QuestionView = styled.TouchableOpacity`
     flex: 1;
     width: 98%;
     height: 97%;
@@ -183,8 +160,8 @@ const QuestionView = styled.View`
     border-radius: 10px;
 `;
 
-export const Question = ({ question, ...rest }) => (
-    <QuestionView {...rest}>
+export const Question = ({ question, disabled, ...rest }) => (
+    <QuestionView disabled={disabled} {...rest}>
         <QuestionText>{question}</QuestionText>
     </QuestionView>
 )
@@ -255,22 +232,3 @@ export const Info = ({text, ...rest}) => (
         <InfoText>{text}</InfoText>
     </ViewInfoText>
 )
-
-// const styles = StyleSheet.create({
-//     container: {
-//         flex: 1,
-//         backgroundColor: '#7C4A41',
-//         alignItems: 'center',
-//         justifyContent: 'center',
-//     },
-//     pin: {
-//         backgroundColor: '#3C6274',
-//         width: 200,
-//         height: 50,
-//     },
-//     pinText: {
-//         color: '#FFFFFF'
-//     }
-// });
-
-// export default styles

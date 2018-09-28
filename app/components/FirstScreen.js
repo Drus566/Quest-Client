@@ -1,13 +1,17 @@
 import React from 'react';
 import { View, Button, Info } from '../styles/styles'
+import AuthApi from '../other/AuthApi'
+import { ActivityIndicator } from 'react-native'
+import Storage from '../other/Storage'
 
 export default class FirstScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state =  { infoMessage: null,
-                        isLoading: false,
+                        isLoading: true,
                         roomsCount: 0,
                         enemiesId: null }
+        this.getMyData(this.state.numberQuestion);
     }
     
     componentWillMount(){
@@ -17,6 +21,22 @@ export default class FirstScreen extends React.Component {
             this.setState({enemiesId: navigation.getParam('enemiesId')});
         } 
     }   
+
+    getMyData = async () => {
+        let token = await Storage.retrieveData("jwt");
+        return AuthApi.checkUserRequest(token)
+            .then((response) => response.json())
+            .then((responseJson) => {
+                this.setState({
+                    myId: responseJson.id,
+                    myName: responseJson.name,
+                    isLoading: false,
+                })
+            })
+            .catch((error) => {
+                console.error(error);
+            })
+    }
 
     render(){
         var buttonList = [];
@@ -31,24 +51,29 @@ export default class FirstScreen extends React.Component {
                 buttonList.push(
                     <Button key={i} title={"Room " + enemiesList[i]} 
                         onPress={() => {this.props.navigation.navigate('Room', 
-                            { enemyId: id, infoMessage: "GGWP" })
+                            {   enemyId: id, 
+                                infoMessage: "GGWP",
+                                myId: this.state.myId,
+                                myName: this.state.myName })
                         }}
                     />
                 )
             }
         }
-        
+        if(this.state.isLoading){
+            return(
+                <View style={{flex: 1, padding: 20 }}>
+                    <ActivityIndicator/>
+                </View>
+            )
+        }
         return(
             <View>
-                {this.state.infoMessage ? 
-                    <Info text={`Enemies: ${this.state.enemiesId}`}/> : null}
+                {/* {this.state.infoMessage ? 
+                    <Info text={`Enemies: ${this.state.enemiesId}`}/> : null} */}
                 <Button
                     title="New Game"
                     onPress={() => {this.props.navigation.navigate('Second')}}
-                />
-                <Button
-                    title="Room"
-                    onPress={() => {this.props.navigation.navigate('Room', {infoMessage: "GGWP"})}}
                 />
                 {buttonList}
             </View>

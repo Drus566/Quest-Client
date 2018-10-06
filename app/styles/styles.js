@@ -4,6 +4,8 @@ import { StatusBar } from 'react-native'
 
 const STATUSBAR_HEIGHT = StatusBar.currentHeight;
 
+//---------------------------- ********* -------------------------------
+
 const ButtonText = styled.Text`
     color: #FFFFFF;
     text-align: center;
@@ -37,6 +39,8 @@ export const Button = ({ title, onPress, disabled, ...rest }) => (
         </TouchableOpacityMode>
     </ButtonWrapper>
 )
+
+//---------------------------- ********* -------------------------------
 
 export const View = styled.View`
     flex: 1;
@@ -144,6 +148,7 @@ export const GameView = styled.View`
         flex-direction: column;
     `}
 `;
+//---------------------------- ********* -------------------------------
 
 const QuestionText = styled.Text`
     color: #FFFFFF;
@@ -165,6 +170,8 @@ export const Question = ({ question, disabled, ...rest }) => (
         <QuestionText>{question}</QuestionText>
     </QuestionView>
 )
+
+//---------------------------- ********* -------------------------------
 
 export const AnswerView = styled.View`
     flex: 1;
@@ -206,12 +213,16 @@ export const InputElement = ({ maxLength, label, onChangeText, placeholder, valu
     </InputView>
 )
 
+//---------------------------- ********* -------------------------------
+
 export const InputWindow = styled.View`
     flex: 1;
     background-color: #7B9B7B;
     align-items: center;
     justify-content: flex-start;
 `;
+
+//---------------------------- ********* -------------------------------
 
 const InfoText = styled.Text`
     color: black;
@@ -232,3 +243,5 @@ export const Info = ({text, ...rest}) => (
         <InfoText>{text}</InfoText>
     </ViewInfoText>
 )
+
+//---------------------------- ********* -------------------------------

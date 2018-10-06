@@ -8,19 +8,19 @@ export default class GameScreen extends React.Component {
 
     constructor(props){
         super(props);
-        this.state = {  numberQuestion: 1,
-                        isLoading: true,
-                        counterRound: "first_round",
-                        disabled: true,
-                        };
+        this.state = {  
+            numberQuestion: 1,
+            counterQuest: 1,
+            counterRound: 1,
+            isLoading: true,
+            disabled: true,
+        };
         this.getQuests(this.state.numberQuestion);
     }
     
     componentWillMount(){
         const { navigation } = this.props;
         this.setState({ currentRound: navigation.getParam('currentRound', 'Не подгрузился')})
-        this.setState({ enemyId: navigation.getParam('enemyId')})
-        this.setState({ myId: navigation.getParam('myId')})
     }
 
     getQuests = async ( number ) => {
@@ -45,76 +45,102 @@ export default class GameScreen extends React.Component {
     }
 
     trueAnswer(){
-        this.setState({ disabled: false,  questApi: {
-            question: 'ВЕРНО',
-            answer: this.state.questApi.answer,
-            first: this.state.questApi.first,
-            second: this.state.questApi.second,
-            third: this.state.questApi.third,
-        } })
+        this.setResultAnswer("green", "ВЕРНО")
     }
 
     falseAnswer(){
-        this.setState({disabled: false, questApi: {
-            question: 'НЕВЕРНО',
-            answer: this.state.questApi.answer,
-            first: this.state.questApi.first,
-            second: this.state.questApi.second,
-            third: this.state.questApi.third,
-        } })
+        this.setResultAnswer("red", "НЕВЕРНО")
     }
 
-    setRoundState(round){
-        this.setState({     
-            [round]: {
-                firstUser: {
-                    id: 3,
-                    answers: {
-                        first: "",
-                        second: "",
-                        third: ""
-                    }
-                },
-                secondUser: {
-                    id: 2,
-                    answers: {
-                        first: "",
-                        second: "",
-                        third: ""
-                    }
+    setResultAnswer(answer, postAnswerText){
+
+        if (this.state.counterQuest == 1){
+            this.setState({
+                answers: {
+                    first: answer,
+                    second: "",
+                    third: ""
                 }
-        },})
+            })
+        }else if (this.state.counterQuest == 2){
+            this.setState({
+                answers: {
+                    first: this.state.answers.first,
+                    second: answer,
+                    third: ""
+                }
+            })
+        }else if (this.state.counterQuest == 3){
+            this.setState({
+                answers:{
+                    first: this.state.answers.first,
+                    second: this.state.answers.second,
+                    third: answer,
+                }
+            })
+        }
+
+        if (this.state.counterQuest < 3){
+            this.setState({
+                counterQuest: this.state.counterQuest + 1,
+            })
+        }else{
+            this.setState({
+                counterQuest: 1
+            })
+        }
+
+        this.setState({
+            disabled: false, 
+            questApi: {
+                question: postAnswerText,
+                answer: this.state.questApi.answer,
+                first: this.state.questApi.first,
+                second: this.state.questApi.second,
+                third: this.state.questApi.third,
+            }
+        })
+    }
+
+    preTransmissionData(){
+        let round 
+        let completed = false
+        let curRound
+
+        if(this.state.currentRound == 1){
+            round = "firstRound"
+            curRound = 2
+        }else if(this.state.currentRound == 2){
+            round = "secondRound"
+            curRound = 3
+        }
+        else if(this.state.currentRound == 3){
+            round = "thirdRound"
+            completed = true
+        }
+
+        this.props.navigation.push('Room',
+            {
+                location: "game",
+                currentRound: curRound,
+                completed: completed,
+                round: round,
+                first: this.state.answers.first,
+                second: this.state.answers.second,
+                third: this.state.answers.third
+            }    
+        )
     }
 
     questWindow(){
-        console.log("QuestWindow");
         if(this.state.numberQuestion == 3)
         {
-            this.props.navigation.navigate('Room', {infoMessage: "GGWP"})
-            this.setState({     
-                first_round: {
-                    firstUser: {
-                        id: 3,
-                        answers: {
-                        first: "",
-                        second: "",
-                        third: ""
-                        }
-                    },
-                    secondUser: {
-                        id: 2,
-                        answers: {
-                            first: "",
-                            second: "",
-                            third: ""
-                        }
-                    }
-            },})
+            this.preTransmissionData();
         }
-        else
-        {
+        else{
             this.setState({numberQuestion: this.state.numberQuestion + 1})
         } 
+
         this.getQuests(this.state.numberQuestion)
         this.setState({ disabled: true })
     }

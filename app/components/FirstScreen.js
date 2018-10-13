@@ -1,62 +1,92 @@
 import React from 'react';
-import { View, Button, Info } from '../styles/styles'
+import { View, Button } from '../styles/styles'
 import AuthApi from '../other/AuthApi'
+import UserApi from '../other/UserApi'
 import { ActivityIndicator } from 'react-native'
 import Storage from '../other/Storage'
 
 export default class FirstScreen extends React.Component {
     constructor(props) {
         super(props);
-        this.state =  { infoMessage: null,
-                        isLoading: true,
-                        roomsCount: 0,
-                        enemiesId: null }
-        this.getMyData(this.state.numberQuestion);
+        this.state =  {
+            isLoading: true,
+            roomsId: null
+        }
+        this.getMyData();
     }
     
     componentWillMount(){
         const { navigation } = this.props;
-        this.setState({infoMessage: navigation.getParam('infoMessage','No-Message')});
-        if(navigation.getParam('enemiesId') != undefined && navigation.getParam('enemiesId') != null){
-            this.setState({enemiesId: navigation.getParam('enemiesId')});
-        } 
     }   
 
     getMyData = async () => {
         let token = await Storage.retrieveData("jwt");
+        let id 
         return AuthApi.checkUserRequest(token)
-            .then((response) => response.json())
-            .then((responseJson) => {
-                this.setState({
-                    myId: responseJson.id,
-                    myName: responseJson.name,
-                    isLoading: false,
-                })
+            .then((response) => {
+                if (response.ok){
+                    return response.json().then(responseJson => {
+                        id = responseJson.id
+                        this.setState({
+                            myId: id,
+                            myName: responseJson.name,
+                        })
+                        return UserApi.getUserRooms(token, id)
+                            .then((response) => { 
+                                if (response){
+                                    return response.json().then(responseJson => {
+                                        this.filterRooms(responseJson)
+                                    })
+                                } else {
+                                    this.setState({ isLoading: false })
+                                }
+                            })
+                            .catch((error) => {
+                                console.error(error)
+                            })
+                    })
+                }
             })
             .catch((error) => {
                 console.error(error);
             })
     }
 
+    filterRooms(data){
+        let roomsId = ''
+        data.forEach(room => {
+            if(!room.completed){
+                if(roomsId.length == 0){
+                    roomsId = room.id
+                }else{
+                    roomsId += ',' + room.id
+                }
+            }
+            this.setState({
+                roomsId: roomsId,
+                isLoading: false
+            })
+        });
+        console.log(roomsId)
+    }
+
     render(){
         var buttonList = [];
-        if(this.state.enemiesId){
-            let enemiesId = this.state.enemiesId + "";
-            let enemiesList = enemiesId.split(',');
-            console.log(enemiesList);
-            for ( i = 0; i < enemiesList.length; i++ )
+        if(this.state.roomsId){
+            let roomsId = this.state.roomsId + "";
+            let roomsList = roomsId.split(',');
+            for ( i = 0; i < roomsList.length; i++ )
             {   
-                let id = enemiesList[i];
-                console.log(enemiesList[i]);
+                let roomId = roomsList[i];
                 buttonList.push(
-                    <Button key={i} title={"Room " + enemiesList[i]} 
+                    <Button key={i} title={"Room " + roomsList[i]} 
                         onPress={() => {this.props.navigation.navigate('Room', 
                             {   
                                 location: "first",
-                                enemyId: id, 
-                                infoMessage: "GGWP",
+                                roomId: roomId,
                                 myId: this.state.myId,
-                                myName: this.state.myName })
+                                myName: this.state.myName
+                            })
                         }}
                     />
                 )
@@ -75,7 +105,11 @@ export default class FirstScreen extends React.Component {
                     <Info text={`Enemies: ${this.state.enemiesId}`}/> : null} */}
                 <Button
                     title="New Game"
-                    onPress={() => {this.props.navigation.navigate('Second')}}
+                    onPress={() => {this.props.navigation.navigate('Second',
+                        {
+                            myId: this.state.myId,
+                        })
+                    }}
                 />
                 {buttonList}
             </View>

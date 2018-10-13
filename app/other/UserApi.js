@@ -5,28 +5,15 @@ class UserApi
         return 'https://zx-drus-zx-quest-api.herokuapp.com' + path
     }
 
-    static logupRequest(name, email, password){
-        return fetch(this.domen('/users'), {
-            method: 'POST',
+    static getUserRooms(token, id){
+        return fetch(this.domen('/rooms/get_user_rooms/' + id), {
+            method: 'GET',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
             },
-            body: JSON.stringify({
-                user:{
-                    name: name,
-                    email: email,
-                    password: password
-                }
-            }),
         })
-        .then(response => {
-            console.log('Success Logup:', response.status)
-            return this.loginRequest(email, password)
-        }).catch(error => {
-            console.log('Error Logup:', error); 
-            return error
-        });
     }
 }
 

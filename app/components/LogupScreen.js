@@ -19,13 +19,18 @@ export default class LogupScreen extends React.Component {
         this.setState({isLoading: true})
         return AuthApi.logupRequest(this.state.name, this.state.email, this.state.password)
             .then((token) => {
-                return AuthApi.checkUserRequest(token.jwt).then(( response ) => 
+                return AuthApi.checkUserRequest(token.jwt)
+                .then(( response ) => 
                 { 
                     this.setState({isLoading: false});
                     if (response.ok) {
                         Storage.storeData("jwt", token.jwt);
-                        this.props.navigation.navigate('First');
+                        return response.json();
                     }
+                })
+                .then((response)=>{
+                    Storage.storeData("id", response.id)
+                    this.props.navigation.navigate('First');
                 })
                 .catch(error => {
                     this.setState({isLoading: false});

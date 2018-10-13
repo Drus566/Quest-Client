@@ -15,6 +15,34 @@ class RoomApi
             },
         })
     }
+
+    static getRoom(token, roomId){
+        return fetch(this.domen('/rooms/' + roomId),{
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+        })
+    }
+
+    static createRoom(token, firstId, secondId){
+        return fetch(this.domen('/rooms'),{
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+            },
+            body: JSON.stringify({
+                room:{
+                    first_user_id: firstId,
+                    second_user_id: secondId
+                }
+            }),
+        })
+    }
 }
 
 export default RoomApi

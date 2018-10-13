@@ -1,12 +1,18 @@
 import React from 'react';
-import { Button, RoomView, Quests, FirstIndicators, 
-    SecondIndicators, Indicator, Round, RoomRoundText } from '../styles/styles'
+import { Button, RoomView, RoomAnswersView, RoomRoundText } from '../styles/styles'
+import { ActivityIndicator } from 'react-native'
+import { View } from '../styles/styles'
+import RoomApi from '../other/RoomApi'
 import Storage from '../other/Storage'
 
 export default class RoomScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state = {  
+            isLoading: true,
+            firstRound: ",,,,,",
+            secondRound: ",,,,,",
+            thirdRound: ",,,,,",
             currentRound: 1,
             completed: false,
         }
@@ -23,149 +29,55 @@ export default class RoomScreen extends React.Component {
         }else if(navigation.getParam('location') == 'first'){
             this.getFromFirst(navigation)
         }
-        this.initialData();
     }
     
     getFromFirst(navigation){
+        let roomId = navigation.getParam('roomId')
         let myId = navigation.getParam('myId')
-        let enemyId = navigation.getParam('enemyId')
+        let myName = navigation.getParam('myName')
+        let enemyId
 
-        this.setState({ myName: navigation.getParam('myName')})
+        let roomData = this.getRoomData(roomId)
+
+        if(roomData.first_user_id == myId){
+            enemyId = roomData.second_user_id    
+        }else{
+            enemyId = roomData.first_user_id
+        }
 
         if (myId == this.state.firstUserId){
             this.setState({ first: true, firstUserId: myId, secondUserId: enemyId })
         }else{
             this.setState({ first: false, firstUserId: enemyId, secondUserId: myId })
         }
-    }
 
-    initialData(){
-        console.log("3AWLA")
-        if(this.state.firstRound == undefined){
-            this.setState({
-                firstRound: {
-                    firstUser: {
-                        answers: {
-                            first: "",
-                            second: "",
-                            third: ""
-                        }
-                    },
-                    secondUser: {
-                        answers: {
-                            first: "",
-                            second: "",
-                            third: ""
-                        }
-                    }
-                },
-                secondRound: {
-                    firstUser: {
-                        answers: {
-                            first: "",
-                            second: "",
-                            third: ""
-                        }
-                    },
-                    secondUser: {
-                        answers: {
-                            first: "",
-                            second: "",
-                            third: ""
-                        }
-                    }
-                },
-                thirdRound: {
-                    firstUser: {
-                        answers: {
-                            first: "",
-                            second: "",
-                            third: ""
-                        }
-                    },
-                    secondUser: {
-                        answers: {
-                            first: "",
-                            second: "",
-                            third: ""
-                        }
-                    }
-                },
-            })
-        }
+        this.setState({ 
+            isLoading: false,
+            myName: myName,
+            firstRound: roomData.first_round ? roomData.first_round : ",,,,,",
+            secondRound: roomData.second_round ? roomData.second_round : ",,,,,",
+            thirdRound: roomData.third_round ? roomData.third_round : ",,,,,",
+        })
     }
 
     getFromGame(navigation){
-        console.log("Method getFromGame")
-        
-        let orderUser
-        let oppositeUser
-        let oppositeAnswers
 
-        let currentRound = navigation.getParam('currentRound')
-        let round = navigation.getParam('round')
-        let completed = navigation.getParam('completed')
-        let firstAnswer = navigation.getParam('first')
-        let secondAnswer = navigation.getParam('second')
-        let thirdAnswer = navigation.getParam('third')
+    }
 
-        if(this.state.first){
-            orderUser = "firstUser"
-            oppositeUser = "secondUser"
-        }else{
-            orderUser = "secondUser"
-            oppositeUser = "firstUser"
-        }
-
-        if(this.state.firstRound == undefined){
-            oppositeAnswers = [,,]
-        }else{
-            if (round == 'firstRound'){
-                if (this.state.first){
-                    oppositeAnswers = Object.values(this.state.firstRound.firstUser.answers)
-                }else{
-                    oppositeAnswers = Object.values(this.state.firstRound.secondUser.answers)
+    getRoomData = async (roomId) => {
+        let token = await Storage.retrieveData("jwt");
+        return RoomApi.getRoom(token, roomId)
+            .then((response) => { 
+                if (response.ok) {
+                    return response.json()
                 }
-            }else if(round == 'secondRound'){
-                if (this.state.first){
-                    oppositeAnswers = Object.values(this.state.secondRound.firstUser.answers)
-                }else{
-                    oppositeAnswers = Object.values(this.state.secondRound.secondUser.answers)
-                }
-            }else if(round == 'thirdRound'){
-                if (this.state.first){
-                    oppositeAnswers = Object.values(this.state.thirdRound.firstUser.answers)
-                }else{
-                    oppositeAnswers = Object.values(this.state.thirdRound.secondUser.answers)
-                }
-            }
-        }
-        
-        
-        this.setState({ currentRound: currentRound, completed: completed })
-        this.setState({
-            [round]: {
-                [orderUser]: {
-                    answers: {
-                        first: firstAnswer,
-                        second: secondAnswer,
-                        third: thirdAnswer,
-                    }
-                },
-                [oppositeUser]:{
-                    answers: {
-                        first: oppositeAnswers[0],
-                        second: oppositeAnswers[1],
-                        third: oppositeAnswers[2],
-                    }
-                }
-            },
-        })
-
-        console.log("Round -", round)
-        console.log("OrderUser -", orderUser)
-        console.log("First Answer -", firstAnswer)
-        console.log("Third Answer -", thirdAnswer)
+            })
+            .then((responseJson) => {
+                return responseJson
+            })
+            .catch((error) => {
+                console.error(error);
+            })
     }
 
     getMyId(){
@@ -183,30 +95,32 @@ export default class RoomScreen extends React.Component {
             return this.state.firstUserId
         }
     }
-
-    validAnswerHelper(answers){
-        let indicatorList = []
-        for(i = 0; i < answers.length; i++){
-            indicatorList.push(<Indicator key={i} typeAnswer={answers[i]} />)
-        }
-        return indicatorList 
-    }
     
-    someMethod(){
-        let SomeVar = React.createElement()
+    getRoundAnswers(dataRound){
+        return dataRound.split(",");
     }
 
     render(){
         let myId = this.getMyId();
         let enemyId = this.getEnemyId();
 
-        let oneRoundFirstIndicatorList = this.validAnswerHelper(Object.values(this.state.firstRound.firstUser.answers));
-        let oneRoundSecondIndicatorList = this.validAnswerHelper(Object.values(this.state.firstRound.secondUser.answers));
-        let twoRoundFirstIndicatorList = this.validAnswerHelper(Object.values(this.state.secondRound.firstUser.answers));
-        let twoRoundSecondIndicatorList = this.validAnswerHelper(Object.values(this.state.secondRound.secondUser.answers));
-        let threeRoundFirstIndicatorList = this.validAnswerHelper(Object.values(this.state.thirdRound.firstUser.answers));
-        let threeRoundSecondIndicatorList = this.validAnswerHelper(Object.values(this.state.thirdRound.secondUser.answers));
+        let checkerFirst = this.state.first
 
+        let firstRoundAnswers = this.getRoundAnswers(this.state.firstRound)
+        let secondRoundAnswers = this.getRoundAnswers(this.state.secondRound)
+        let thirdRoundAnswers = this.getRoundAnswers(this.state.thirdRound)
+
+        let firstIndicators = React.createElement(RoomAnswersView, [answers={firstRoundAnswers}, textRound="Round One", first={checkerFirst}])
+        let secondIndicators = React.createElement(RoomAnswersView, [answers={secondRoundAnswers}, textRound="Round Two", first={checkerFirst}])
+        let thirdIndicators = React.createElement(RoomAnswersView, [answers={thirdRoundAnswers}, textRound="Round Three", first={checkerFirst}])
+        
+        if(this.state.isLoading){
+            return(
+                <View style={{flex: 1, padding: 20 }}>
+                    <ActivityIndicator/>
+                </View>
+            )
+        }
         return(
             <RoomView>
                 <RoomView header>
@@ -214,79 +128,11 @@ export default class RoomScreen extends React.Component {
                     <RoomRoundText>Enemy Id: {enemyId}</RoomRoundText>
                     <RoomRoundText>My Name: {this.state.myName}</RoomRoundText>
                 </RoomView>
-                
-                {this.state.first ? 
-                    (<RoomView body>
-                        <Quests>
-                            <FirstIndicators>
-                                {oneRoundFirstIndicatorList}
-                            </FirstIndicators>
-                            <Round>
-                                <RoomRoundText>Round One</RoomRoundText>
-                            </Round>
-                            <SecondIndicators>
-                                {oneRoundSecondIndicatorList}
-                            </SecondIndicators>
-                        </Quests>
-                        <Quests>
-                            <FirstIndicators>
-                                {twoRoundFirstIndicatorList}
-                            </FirstIndicators>
-                            <Round>
-                                <RoomRoundText>Round Two</RoomRoundText>
-                            </Round>
-                            <SecondIndicators>
-                                {twoRoundSecondIndicatorList}
-                            </SecondIndicators>
-                        </Quests>
-                        <Quests>
-                            <FirstIndicators>
-                                {threeRoundFirstIndicatorList}
-                            </FirstIndicators>
-                            <Round>
-                                <RoomRoundText>Round Three</RoomRoundText>
-                            </Round>
-                            <SecondIndicators>
-                                {threeRoundSecondIndicatorList}
-                            </SecondIndicators>
-                        </Quests>
-                    </RoomView>):
-                    (<RoomView body>
-                        <Quests>
-                            <FirstIndicators>
-                                {oneRoundSecondIndicatorList}
-                            </FirstIndicators>
-                            <Round>
-                                <RoomRoundText>Round One</RoomRoundText>
-                            </Round>
-                            <SecondIndicators>
-                                {oneRoundFirstIndicatorList}
-                            </SecondIndicators>
-                        </Quests>
-                        <Quests>
-                            <FirstIndicators>
-                                {twoRoundSecondIndicatorList}
-                            </FirstIndicators>
-                            <Round>
-                                <RoomRoundText>Round Two</RoomRoundText>
-                            </Round>
-                            <SecondIndicators>
-                                {twoRoundFirstIndicatorList}
-                            </SecondIndicators>
-                        </Quests>
-                        <Quests>
-                            <FirstIndicators>
-                                {threeRoundSecondIndicatorList}
-                            </FirstIndicators>
-                            <Round>
-                                <RoomRoundText>Round Three</RoomRoundText>
-                            </Round>
-                            <SecondIndicators>
-                                {threeRoundFirstIndicatorList}
-                            </SecondIndicators>
-                        </Quests>
-                    </RoomView>
-                )}
+                <RoomView body>
+                    {firstIndicators}
+                    {secondIndicators}
+                    {thirdIndicators}
+                </RoomView>
                 <RoomView footer>
                     <Button 
                         title="Play"

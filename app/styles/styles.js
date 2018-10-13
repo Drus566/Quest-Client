@@ -74,7 +74,7 @@ export const RoomView = styled.View`
     `}
 `;
 
-export const Quests = styled.View`
+const Quests = styled.View`
     flex: 1;
     justify-content: center;
     align-items: center;
@@ -82,7 +82,7 @@ export const Quests = styled.View`
     background-color: #1898;
 `
 
-export const FirstIndicators = styled.View`
+const FirstIndicators = styled.View`
     flex: 1;
     justify-content: space-around;
     align-items: center;
@@ -90,7 +90,7 @@ export const FirstIndicators = styled.View`
     height: 25%;
 `
 
-export const SecondIndicators = styled.View`
+const SecondIndicators = styled.View`
     flex: 1;
     justify-content: space-around;
     align-items: center;
@@ -99,7 +99,7 @@ export const SecondIndicators = styled.View`
     height: 25%;
 `
 
-export const Indicator = styled.View`
+const Indicator = styled.View`
     flex: 0.25;
     height: 100%;
     width: 100;
@@ -108,7 +108,7 @@ export const Indicator = styled.View`
     border: 1px solid black;
 `
 
-export const Round = styled.View`
+const Round = styled.View`
     flex: 0.5;
     height: 50%;
     width: 100;
@@ -123,6 +123,44 @@ export const RoomRoundText = styled.Text`
     color: black;
     text-align: center;
 `
+
+export const RoomAnswersView = ({ answers, textRound, first }) => (
+    first ? (
+        <Quests>
+            <FirstIndicators>
+                <Indicator typeAnswer={answers[0]} />
+                <Indicator typeAnswer={answers[1]} />
+                <Indicator typeAnswer={answers[2]} />
+            </FirstIndicators>
+            <Round>
+                <RoomRoundText>{textRound}</RoomRoundText>
+            </Round>
+            <SecondIndicators>
+                <Indicator typeAnswer={answers[3]} />
+                <Indicator typeAnswer={answers[4]} />
+                <Indicator typeAnswer={answers[5]} />
+            </SecondIndicators>
+        </Quests>
+    ) : (
+        <Quests>
+            <SecondIndicators>
+                <Indicator typeAnswer={answers[3]} />
+                <Indicator typeAnswer={answers[4]} />
+                <Indicator typeAnswer={answers[5]} />
+            </SecondIndicators>
+            <Round>
+                <RoomRoundText>{textRound}</RoomRoundText>
+            </Round>
+            <FirstIndicators>
+                <Indicator typeAnswer={answers[0]} />
+                <Indicator typeAnswer={answers[1]} />
+                <Indicator typeAnswer={answers[2]} />
+            </FirstIndicators>
+        </Quests>
+    )
+)
+
+//---------------------------- ********* -------------------------------
 
 export const GameView = styled.View`
     flex: 1;
@@ -148,6 +186,7 @@ export const GameView = styled.View`
         flex-direction: column;
     `}
 `;
+
 //---------------------------- ********* -------------------------------
 
 const QuestionText = styled.Text`
@@ -180,6 +219,8 @@ export const AnswerView = styled.View`
     flex-direction: row;
     flex-wrap: wrap;
 `;
+
+//---------------------------- ********* -------------------------------
 
 const TextInput = styled.TextInput`
     width: 98%;

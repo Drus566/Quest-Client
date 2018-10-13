@@ -10,41 +10,18 @@ export default class SecondScreen extends React.Component{
 
     constructor(props) {
         super(props);
-        this.state =  { token: null,
-                        infoMessage: null,
-                        isLoading: false,
-                        enemiesId: null
+        this.state =  { 
+            isLoading: false,
         }
-        this._didFocusSubscription = props.navigation.addListener('didFocus', payload => 
-            BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
-        );
     }
 
-    componentDidMount(){
-        this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload => 
-            BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
-        );
-    }
-
-    onBackButtonPressAndroid = () => {
-        let data;
-        if (this.state.enemiesId){
-            data = this.state.enemiesId;
-        }
-        this.props.navigation.push('First', {
-            enemiesId: data
-        });
-        return true;
-    }
-
-    componentWillUnmount() {
-        this._didFocusSubscription && this._didFocusSubscription.remove();
-        this._willBlurSubscription && this._willBlurSubscription.remove();
+    componentWillMount(){
+        const { navigation } = this.props;
+        this.setState({ myId: navigation.getParam('myId')});
     }
 
     randomPlayer = async () => {
         let token = await Storage.retrieveData("jwt");
-        console.log("MAIN: ",token);
         return RoomApi.randomPlayerRequest(token)
             .then(response => {
                 if(response.ok){
@@ -57,15 +34,24 @@ export default class SecondScreen extends React.Component{
             })
             .then(response => {
                 if (response){
-                    console.log("Enemy Id:", response);
-                    if (this.state.enemiesId != null){
-                        this.setState({ enemiesId: this.state.enemiesId + "," + response })
-                    }else{
-                        this.setState({ enemiesId: response })
-                    }
-                    this.props.navigation.push('First', {
-                        enemiesId: this.state.enemiesId
-                    });
+                    return RoomApi.createRoom(token, this.state.myId, response)
+                        .then(response => {
+                            if(response.ok){
+                                console.log('...Room Created...')
+                                return response.json();
+                            }else{
+                                console.log('...Room Not Created...')
+                                console.log(response.status)
+                            }
+                        })
+                        .then(response => {
+                            console.log("Room Id:",response.id)
+                            this.props.navigation.push('First')
+                        })
+                        .catch(error => {
+                            console.log('Error create room:', error)
+                            return error
+                        })
                 }
             })
             .catch(error => {
@@ -79,7 +65,6 @@ export default class SecondScreen extends React.Component{
             return(
                 <View style={{flex: 1, padding: 20 }}>
                     <ActivityIndicator/>
-                    <Info text={this.state.infoMessage}/>
                 </View>
             )
         }
